@@ -3,10 +3,13 @@ package com.personal.pos_api.security;
 import com.personal.pos_api.entity.User;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 
 @Data
 @Builder
@@ -20,10 +23,27 @@ public class UserPrincipal implements UserDetails {
     private Collection<? extends GrantedAuthority> authorities;
 
     public static UserPrincipal create(User user) {
+        List<GrantedAuthority> authorities = new ArrayList<>();
+
+        user.getRoles().forEach(role -> {
+
+            // ROLE
+            authorities.add(
+                    new SimpleGrantedAuthority("ROLE_" + role.getName())
+            );
+
+            // PERMISSION
+            role.getPermissions().forEach(permission ->
+                    authorities.add(
+                            new SimpleGrantedAuthority(permission.getName())
+                    )
+            );
+        });
         return UserPrincipal.builder()
                 .id(user.getId())
                 .email(user.getEmail())
                 .password(user.getPassword())
+                .authorities(authorities)
                 .build();
     }
 
@@ -39,7 +59,7 @@ public class UserPrincipal implements UserDetails {
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return Collections.emptyList();//authorities
+        return authorities;//authorities
     }
 
     @Override public boolean isEnabled() { return true; }
@@ -47,19 +67,3 @@ public class UserPrincipal implements UserDetails {
     @Override public boolean isAccountNonLocked() { return true; }
     @Override public boolean isCredentialsNonExpired() { return true; }
 }
-
-/*
-   // get per
-        Set<String> permissions = user.getAllPermissions();
-
-        // Convert permissions to GrantedAuthority
-        List<GrantedAuthority> authorities = permissions.stream()
-                .map(permission -> new SimpleGrantedAuthority(permission))
-                .collect(Collectors.toList());
-
-        // add roles as authorities (prefix ROLE_)
-        user.getRoles().forEach(role ->
-                authorities.add(new SimpleGrantedAuthority("ROLE_" + role.getName()))
-        );
-        .authorities(authorities)
- */

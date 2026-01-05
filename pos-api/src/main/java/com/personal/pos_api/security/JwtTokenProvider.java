@@ -9,13 +9,16 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
+import org.springframework.util.CollectionUtils;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
 import java.util.StringJoiner;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Component
 @Slf4j
@@ -54,7 +57,9 @@ public class JwtTokenProvider {
     }
 
     private String buildScope(UserPrincipal user) {
-        StringJoiner stringJoiner = new StringJoiner(" ");
-        return stringJoiner.toString();
+        return user.getAuthorities().stream()
+                .map(GrantedAuthority::getAuthority)
+                .distinct()
+                .collect(Collectors.joining(" "));
     }
 }
