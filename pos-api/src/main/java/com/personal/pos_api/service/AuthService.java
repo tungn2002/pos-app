@@ -1,7 +1,11 @@
 package com.personal.pos_api.service;
 
+import com.nimbusds.jose.JOSEException;
 import com.personal.pos_api.dto.request.AuthenticationRequest;
+import com.personal.pos_api.dto.request.LogoutRequest;
 import com.personal.pos_api.dto.response.AuthenticationResponse;
+import com.personal.pos_api.entity.InvalidatedToken;
+import com.personal.pos_api.repository.InvalidatedTokenRepository;
 import com.personal.pos_api.repository.UserRepository;
 import com.personal.pos_api.security.JwtTokenProvider;
 import lombok.AccessLevel;
@@ -15,6 +19,9 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
+import java.util.Date;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
@@ -22,6 +29,7 @@ import org.springframework.stereotype.Service;
 public class AuthService {
 
     UserRepository userRepository;
+    InvalidatedTokenRepository invalidatedTokenRepository;
     AuthenticationManager authenticationManager;
     private JwtTokenProvider tokenProvider;
 
@@ -38,4 +46,19 @@ public class AuthService {
 
         return AuthenticationResponse.builder().token(token).build();
     }
+
+    public void logout(LogoutRequest request) throws ParseException, JOSEException {
+        var signToken = tokenProvider.verifyToken(request.getToken());
+
+        String jti=signToken.getJWTClaimsSet().getJWTID();
+        Date expiryTime = signToken.getJWTClaimsSet().getExpirationTime();
+
+        InvalidatedToken invalidatedToken = InvalidatedToken.builder()
+                .id(jti)
+                .expiryTime(expiryTime)
+                .build();
+
+        invalidatedTokenRepository.save(invalidatedToken);
+    }
+
 }

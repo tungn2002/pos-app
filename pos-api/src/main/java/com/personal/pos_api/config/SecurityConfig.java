@@ -1,8 +1,6 @@
 package com.personal.pos_api.config;
 
 import com.personal.pos_api.security.CustomUserDetailsService;
-import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -17,35 +15,34 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtDecoder;
-import org.springframework.security.oauth2.jwt.NimbusJwtDecoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
 
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfig {
     private final String[] PUBLIC_ENDPOINTS = {
-            "/auth/login"
+            "/auth/login","/auth/logout"
     };
 
     private final CustomUserDetailsService customUserDetailsService;
     private final String jwtSecret;
     private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
+    private final CustomJwtDecoder customJwtDecoder;
 
     public SecurityConfig(
             CustomUserDetailsService customUserDetailsService,
             @Value("${jwt.signerKey}") String jwtSecret,
-            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint
+            JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint,
+            CustomJwtDecoder customJwtDecoder
     ) {
         this.customUserDetailsService = customUserDetailsService;
         this.jwtSecret = jwtSecret;
         this.jwtAuthenticationEntryPoint = jwtAuthenticationEntryPoint;
+        this.customJwtDecoder=customJwtDecoder;
     }
 
     @Bean
@@ -58,7 +55,7 @@ public class SecurityConfig {
 
         httpSecurity.oauth2ResourceServer(oauth2 -> oauth2
                 .jwt(jwt -> jwt
-                        .decoder(jwtDecoder())
+                        .decoder(customJwtDecoder)
                         .jwtAuthenticationConverter(jwtAuthenticationConverter())
                 )
                 .authenticationEntryPoint(jwtAuthenticationEntryPoint)
@@ -66,12 +63,6 @@ public class SecurityConfig {
         httpSecurity.authenticationProvider(authenticationProvider());
 
         return httpSecurity.build();
-    }
-
-    @Bean
-    public JwtDecoder jwtDecoder() {
-        SecretKey secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
-        return NimbusJwtDecoder.withSecretKey(secretKey).build();
     }
 
     @Bean
@@ -105,5 +96,11 @@ public class SecurityConfig {
 
         return jwtAuthConverter;
     }
-
+/*
+    @Bean
+    public JwtDecoder jwtDecoder() {
+        SecretKey secretKey = new SecretKeySpec(jwtSecret.getBytes(), "HmacSHA256");
+        return NimbusJwtDecoder.withSecretKey(secretKey).build();
+    }
+*/
 }

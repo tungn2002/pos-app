@@ -1,7 +1,9 @@
 package com.personal.pos_api.controller;
 
+import com.nimbusds.jose.JOSEException;
 import com.personal.pos_api.dto.ApiResponse;
 import com.personal.pos_api.dto.request.AuthenticationRequest;
+import com.personal.pos_api.dto.request.LogoutRequest;
 import com.personal.pos_api.dto.response.AuthenticationResponse;
 import com.personal.pos_api.service.AuthService;
 import lombok.AccessLevel;
@@ -10,6 +12,8 @@ import lombok.experimental.FieldDefaults;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.text.ParseException;
 
 @RestController
 @RequestMapping("/auth")
@@ -34,5 +38,11 @@ public class AuthController {
     @GetMapping("/token2")
     public String testToken2() {
         return "abc";
+    }
+
+    @PostMapping("/logout")
+    ApiResponse<Void> logout(@RequestBody LogoutRequest request) throws ParseException, JOSEException {
+        authService.logout(request);
+        return ApiResponse.<Void>builder().build();
     }
 }

@@ -3,26 +3,36 @@ package com.personal.pos_api.security;
 import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jose.JWSAlgorithm;
 import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSVerifier;
 import com.nimbusds.jose.crypto.MACSigner;
+import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
+import com.personal.pos_api.enums.ErrorCode;
+import com.personal.pos_api.exception.AppException;
+import com.personal.pos_api.repository.InvalidatedTokenRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.Date;
-import java.util.StringJoiner;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
 @Slf4j
 public class JwtTokenProvider {
+    private final InvalidatedTokenRepository invalidatedTokenRepository;
+
+    public JwtTokenProvider(InvalidatedTokenRepository invalidatedTokenRepository) {
+        this.invalidatedTokenRepository = invalidatedTokenRepository;
+    }
+
     @Value("${jwt.signerKey}")
     private String jwtSecret;
 
@@ -61,5 +71,23 @@ public class JwtTokenProvider {
                 .map(GrantedAuthority::getAuthority)
                 .distinct()
                 .collect(Collectors.joining(" "));
+    }
+
+    public SignedJWT verifyToken(String token) throws ParseException, JOSEException {
+        SignedJWT jwt = SignedJWT.parse(token);
+
+        JWSVerifier verifier = new MACVerifier(jwtSecret.getBytes());
+
+        Date expiryTime = jwt.getJWTClaimsSet().getExpirationTime();
+
+        var verified = jwt.verify(verifier);
+
+        if(!(verified && expiryTime.after(new Date())))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        if (invalidatedTokenRepository.existsById(jwt.getJWTClaimsSet().getJWTID()))
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return jwt;
     }
 }
