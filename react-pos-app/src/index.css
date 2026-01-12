@@ -1,7 +1,5 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
   line-height: 1.5;
   font-weight: 400;
 
@@ -26,11 +24,10 @@ a:hover {
 
 body {
   margin: 0;
+  display: flex;
+  place-items: center;
   min-width: 320px;
   min-height: 100vh;
-  background-color: #f9fafb;
-  color: #213547;
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
 }
 
 h1 {
@@ -38,27 +35,6 @@ h1 {
   line-height: 1.1;
 }
 
-/* Custom scrollbar styling */
-::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
-}
-
-/* Modern button styles */
 button {
   border-radius: 8px;
   border: 1px solid transparent;
@@ -66,42 +42,16 @@ button {
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
+  background-color: #1a1a1a;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: border-color 0.25s;
 }
 button:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  border-color: #646cff;
 }
 button:focus,
 button:focus-visible {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Override for admin dashboard sidebar buttons */
-.admin-sidebar .nav-item > button {
-  background-color: transparent !important;
-  border: none !important;
-  box-shadow: none !important;
-}
-
-/* Specific styling for active button to maintain blue background */
-.admin-sidebar .nav-item.selected > button,
-.admin-sidebar button.bg-blue-600 {
-  background-color: #2563eb !important; /* bg-blue-600 color */
-  border: 1px solid transparent !important;
-}
-
-/* Hover effect for sidebar buttons */
-.admin-sidebar .nav-item > button:hover {
-  background-color: rgba(255, 255, 255, 0.1) !important;
-}
-
-/* Remove background from header buttons */
-.admin-header button {
-  background-color: transparent !important;
-  border: none !important;
+  outline: 4px auto -webkit-focus-ring-color;
 }
 
 @media (prefers-color-scheme: light) {

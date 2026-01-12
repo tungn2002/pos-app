@@ -1,0 +1,66 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background-color: #f1f5f9;
+}
+
+/* Border rõ nét hơn cho sidebar items */
+.sidebar-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem;
+  background: none;
+  border: none;
+  border-left: 4px solid transparent;
+  cursor: pointer;
+  font-family: inherit;
+  color: inherit;
+  width: 100%;
+  text-align: left;
+  border-radius: 0 0.375rem 0.375rem 0;
+  transition: all 0.3s ease;
+}
+
+.sidebar-item:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+  border-left-color: #3b82f6;
+}
+
+.sidebar-item.active {
+  background-color: rgba(255, 255, 255, 0.15);
+  border-left-color: #3b82f6;
+  color: white;
+}
+
+/* Tăng độ đậm của Border và Shadow cho Card */
+.card-classic {
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+  border-radius: 0.75rem;
+}
+
+/* Đường kẻ bảng rõ hơn */
+.table-classic th,
+.table-classic td {
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.table-classic thead th {
+  border-bottom: 2px solid #cbd5e1;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #94a3b8;
+  border-radius: 10px;
+}

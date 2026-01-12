@@ -1,32 +1,31 @@
-import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import Dashboard from './components/admin/dashboard/Dashboard';
-import PosPage from './components/pos/NewPosPage'; // Use the new POS page
-import OrderInquiryPage from './components/pos/OrderInquiryPage';
-import InventoryInquiryPage from './components/pos/InventoryInquiryPage';
-import OrderManagement from './components/admin/order/OrderManagement';
-import Login from './components/auth/Login';
-import Register from './components/auth/Register';
-import ForgotPassword from './components/auth/ForgotPassword';
+import { useState } from 'react';
+import { Sidebar, Navbar } from './components';
+import { Dashboard, Products, POS } from './pages';
+import './styles/global.css';
 
 function App() {
-  return (
-    <Router>
-      <Routes>
-        {/* Authentication Routes */}
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/forgot-password" element={<ForgotPassword />} />
+  const [activePage, setActivePage] = useState('pos');
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
-        {/* Protected Routes - redirect to login if not authenticated */}
-        <Route path="/" element={<Navigate to="/dashboard" />} />
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/pos" element={<PosPage />} />
-        <Route path="/order-inquiry" element={<OrderInquiryPage />} />
-        <Route path="/inventory-inquiry" element={<InventoryInquiryPage />} />
-        <Route path="/admin/orders" element={<OrderManagement />} />
-      </Routes>
-    </Router>
+  return (
+    <div className="flex w-screen h-screen overflow-hidden bg-slate-50">
+      {activePage !== 'pos' && (
+        <>
+          <Sidebar activePage={activePage} onNavigate={setActivePage} isOpen={sidebarOpen} />
+
+          <main className="flex-1 flex flex-col min-w-0 overflow-hidden">
+            <Navbar onMenuToggle={() => setSidebarOpen(!sidebarOpen)} />
+
+            <div className="flex-1 overflow-y-auto p-8 w-full">
+              {activePage === 'dashboard' && <Dashboard />}
+              {activePage === 'products' && <Products />}
+            </div>
+          </main>
+        </>
+      )}
+      {activePage === 'pos' && <POS onSwitchToAdmin={() => setActivePage('dashboard')} />}
+    </div>
   );
 }
 
-export default App
+export default App;
